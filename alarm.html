@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sleep Alarm Calculator</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* ------------------------------------ */
+    /* 1) Custom range‐slider styling       */
+    /* ------------------------------------ */
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 0.75rem; /* 12px */
+      border-radius: 0.375rem; /* rounded-md */
+      background: transparent;   /* transparent so we can draw a gradient */
+    }
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 0.75rem;
+      border-radius: 0.375rem;
+      background: linear-gradient(to right, #4F46E5, #3B82F6); /* purple → blue */
+    }
+    input[type="range"]::-moz-range-track {
+      height: 0.75rem;
+      border-radius: 0.375rem;
+      background: linear-gradient(to right, #4F46E5, #3B82F6);
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 1.25rem;  /* 20px */
+      height: 1.25rem;
+      border-radius: 9999px;
+      background-color: #2563EB; /* blue-600 */
+      border: 2px solid #ffffff;
+      margin-top: -0.25rem; /* center vertically on the track */
+      transition: transform 0.2s ease-in-out;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.1);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 1.25rem;
+      height: 1.25rem;
+      border-radius: 9999px;
+      background-color: #2563EB;
+      border: 2px solid #ffffff;
+      transition: transform 0.2s ease-in-out;
+    }
+    input[type="range"]::-moz-range-thumb:hover {
+      transform: scale(1.1);
+    }
+    input[type="range"]:focus {
+      outline: none; /* remove default focus outline */
+    }
+
+    /* ------------------------------------ */
+    /* 2) Tooltip styling & transitions      */
+    /* ------------------------------------ */
+    .slider-container {
+      position: relative;
+      width: 100%;
+    }
+    .tooltip {
+      position: absolute;
+      top: -3rem; /* position above thumb */
+      transform: translateX(-50%);
+      background-color: rgba(75, 85, 99, 0.9); /* bg-gray-700 @ 90% opacity */
+      color: #ffffff;
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.375rem; /* rounded-md */
+      white-space: nowrap;
+      font-size: 0.875rem; /* text-sm */
+      pointer-events: none;
+      opacity: 0;
+      transition: left 0.3s ease, opacity 0.3s ease;
+    }
+    .tooltip.visible {
+      opacity: 1;
+    }
+    .tooltip::after {
+      content: "";
+      position: absolute;
+      bottom: -0.375rem; /* arrow below the tooltip */
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 0.375rem;
+      border-style: solid;
+      border-color: rgba(75, 85, 99, 0.9) transparent transparent transparent;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-b from-gray-800 via-gray-900 to-black text-white flex flex-col">
+  <div class="flex-grow container mx-auto px-4 py-6 flex flex-col items-center">
+    <!-- Logo Placeholder -->
+    <div id="logo" class="mb-8">
+      <!-- Replace "logo-placeholder.png" with your actual logo file/path -->
+      <img src="logo.png" alt="Logo" class="w-24 h-24 object-contain mx-auto" />
+    </div>
+
+    <!-- Controls Section (sliders + button) -->
+    <div id="controls" class="w-full max-w-md">
+      <!-- 1) Sleep Duration Slider -->
+      <div class="mb-14">
+        <label for="sleep-duration-slider" class="block mb-4 text-sm font-medium">
+          How long should you sleep?
+        </label>
+        <div class="slider-container mb-4">
+          <div id="sleep-duration-tooltip" class="tooltip">
+            <div class="flex items-center space-x-1">
+              <!-- Bed Icon (Heroicons) -->
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 13h18M5 13V8a2 2 0 012-2h10a2 2 0 012 2v5m-2 0v6m-12-6v6m8-6v6M4 19h16" />
+              </svg>
+              <span id="sleep-duration-text">Enough to be Rested</span>
+            </div>
+          </div>
+          <input
+            type="range"
+            id="sleep-duration-slider"
+            min="1"
+            max="4"
+            step="1"
+            value="3"
+          />
+        </div>
+        <div class="flex justify-between text-xs text-gray-300 px-1">
+          <span>Quick Nap</span>
+          <span>Long Nap</span>
+          <span>Rested</span>
+          <span>Full Night</span>
+        </div>
+      </div>
+
+      <!-- 2) Sleep Latency Slider -->
+      <div class="mb-14">
+        <label for="sleep-latency-slider" class="block mb-4 text-sm font-medium">
+          How long to fall asleep?
+        </label>
+        <div class="slider-container mb-4">
+          <div id="sleep-latency-tooltip" class="tooltip">
+            <div class="flex items-center space-x-1">
+              <!-- Moon Icon (Heroicons) -->
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M20.354 15.354A9 9 0 018.646 3.646a9.003 9.003 0 1011.708 11.708z" />
+              </svg>
+              <span id="sleep-latency-text">Average (10–20 min)</span>
+            </div>
+          </div>
+          <input
+            type="range"
+            id="sleep-latency-slider"
+            min="1"
+            max="4"
+            step="1"
+            value="3"
+          />
+        </div>
+        <div class="flex justify-between text-xs text-gray-300 px-1">
+          <span>Very Fast</span>
+          <span>Fast</span>
+          <span>Average</span>
+          <span>Long</span>
+        </div>
+      </div>
+
+      <!-- 3) Calculate Button -->
+      <button
+        id="calculate-button"
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-full transition-colors duration-200"
+      >
+        Calculate Wake Time
+      </button>
+
+      <!-- 4) Sleeping Animation (hidden until button click) -->
+      <div id="sleep-animation" class="hidden flex flex-col items-center mt-6">
+        <p class="text-5xl animate-pulse">Zzz...</p>
+      </div>
+
+      <!-- 5) Result Placeholder (hidden until after animation) -->
+      <div id="result" class="hidden mt-6 text-2xl font-semibold text-center">
+        Your wake-up time is: <span id="wake-time">--:--</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ------------------------------------ -->
+  <!--  JavaScript Calculation Logic        -->
+  <!-- ------------------------------------ -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // 1) Grab slider elements + tooltips:
+      const durationSlider  = document.getElementById("sleep-duration-slider");
+      const latencySlider   = document.getElementById("sleep-latency-slider");
+      const durationTooltip = document.getElementById("sleep-duration-tooltip");
+      const durationText    = document.getElementById("sleep-duration-text");
+      const latencyTooltip  = document.getElementById("sleep-latency-tooltip");
+      const latencyText     = document.getElementById("sleep-latency-text");
+
+      // 2) Grab animation + result containers:
+      const sleepAnimation  = document.getElementById("sleep-animation");
+      const resultContainer = document.getElementById("result");
+      const wakeTimeSpan    = document.getElementById("wake-time");
+
+      // 3) Mappings for the sliders:
+      //    slider value 1→4 → descriptive text
+      const durationOptions = {
+        1: "Quick Nap",
+        2: "Long Nap",
+        3: "Enough to be Rested",
+        4: "Full Night Sleep",
+      };
+      const latencyOptions = {
+        1: "Very Fast (< 5 min)",
+        2: "Fast (6–10 min)",
+        3: "Average (12–18 min)",
+        4: "Long (20–30 min)",
+      };
+
+      // 4) Function: position tooltip + set text
+      function updateTooltip(slider, tooltip, textElem, mapObj) {
+        const min = parseFloat(slider.min);
+        const max = parseFloat(slider.max);
+        const val = parseFloat(slider.value);
+        const percent = ((val - min) / (max - min)) * 100;
+
+        // 4a) update text inside tooltip:
+        textElem.textContent = mapObj[val];
+
+        // 4b) move tooltip horizontally to the thumb's percent position:
+        tooltip.style.left = `${percent}%`;
+
+        // 4c) fade in (if not already visible):
+        tooltip.classList.add("visible");
+      }
+
+      // 5) On load: set initial positions for both tooltips:
+      updateTooltip(durationSlider, durationTooltip, durationText, durationOptions);
+      updateTooltip(latencySlider, latencyTooltip, latencyText, latencyOptions);
+
+      // 6) When user drags duration slider:
+      durationSlider.addEventListener("input", () => {
+        updateTooltip(durationSlider, durationTooltip, durationText, durationOptions);
+      });
+      // 7) When user drags latency slider:
+      latencySlider.addEventListener("input", () => {
+        updateTooltip(latencySlider, latencyTooltip, latencyText, latencyOptions);
+      });
+
+      // 8) When user clicks "Calculate Wake Time":
+      document.getElementById("calculate-button").addEventListener("click", () => {
+        // Hide any previous result or tooltip (optional cleanup)
+        resultContainer.classList.add("hidden");
+
+        // 8a) Show the Zzz animation:
+        sleepAnimation.classList.remove("hidden");
+
+        // 8b) After 2 seconds → hide animation, compute wake time, show result:
+        setTimeout(() => {
+          sleepAnimation.classList.add("hidden");
+
+          // ----- Begin: compute actual wake‐time -----
+          const now = new Date(); // B = “now” (bedtime)
+
+          // 1) Compute L based on latency slider:
+          const latencyVal = parseInt(latencySlider.value, 10);
+          let L; // L in minutes
+          if (latencyVal === 1) {
+            // Very Fast: random between 3 and 5
+            L = 3 + Math.random() * (5 - 3);
+          } else if (latencyVal === 2) {
+            // Fast: random between 6 and 10
+            L = 6 + Math.random() * (10 - 6);
+          } else if (latencyVal === 3) {
+            // Average: random between 12 and 18
+            L = 12 + Math.random() * (18 - 12);
+          } else {
+            // latencyVal === 4 → Long: random between 20 and 30
+            L = 20 + Math.random() * (30 - 20);
+          }
+          // Round L to nearest integer minute:
+          L = Math.round(L);
+
+          // 2) Determine k (number of cycles) based on duration slider:
+          const durationVal = parseInt(durationSlider.value, 10);
+          let k;
+          if (durationVal === 1) {
+            // Quick Nap: special case (no cycles)
+            k = null;
+          } else if (durationVal === 2) {
+            // Long Nap: 1 cycle
+            k = 1;
+          } else if (durationVal === 3) {
+            // Rested: 4 cycles
+            k = 4;
+          } else {
+            // durationVal === 4 → Full Night Sleep: 5 cycles
+            k = 5;
+          }
+
+          // 3) Compute wake time in minutes from “now”:
+          let wakeOffsetMin;
+          const C = 90; // one full cycle = 90 min
+          if (k === null) {
+            // Quick Nap: wakeOffset = L + 20
+            wakeOffsetMin = L + 20;
+          } else {
+            // For Long Nap, Rested, Full Night → wakeOffset = L + k * C
+            wakeOffsetMin = L + k * C;
+          }
+
+          // 4) Convert wakeOffsetMin → future Date object:
+          const wakeDate = new Date(now.getTime() + wakeOffsetMin * 60 * 1000);
+
+          // 5) Format as "HH:MM" (24-hour clock, leading zeros):
+          let hh = wakeDate.getHours();
+          let mm = wakeDate.getMinutes();
+          if (hh < 10) hh = "0" + hh;
+          if (mm < 10) mm = "0" + mm;
+          const formatted = `${hh}:${mm}`;
+
+          // 6) Show the formatted time in the result placeholder:
+          wakeTimeSpan.textContent = formatted;
+          resultContainer.classList.remove("hidden");
+        }, 2000);
+      });
+    });
+  </script>
+</body>
+</html>
