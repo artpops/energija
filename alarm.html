@@ -186,6 +186,11 @@
       </div>
     </div>
   </div>
+  <div id="calc-info-btn" class="fixed bottom-4 right-4 w-8 h-8 rounded-full bg-gray-700 bg-opacity-60 flex items-center justify-center text-white cursor-pointer">?
+  </div>
+  <div id="calc-info-box" class="hidden fixed bottom-16 right-4 bg-gray-700 bg-opacity-90 text-white text-sm p-4 rounded-md max-w-xs">
+    We pick a random fall-asleep time within your chosen range and add 90‑minute cycles (or 20&nbsp;min for a quick nap) to estimate your wake-up time.
+  </div>
 
   <!-- ------------------------------------ -->
   <!--  JavaScript Calculation Logic        -->
@@ -204,6 +209,8 @@
       const sleepAnimation  = document.getElementById("sleep-animation");
       const resultContainer = document.getElementById("result");
       const wakeTimeSpan    = document.getElementById("wake-time");
+      const infoBtn         = document.getElementById("calc-info-btn");
+      const infoBox         = document.getElementById("calc-info-box");
 
       // 3) Mappings for the sliders:
       //    slider value 1→4 → descriptive text
@@ -248,6 +255,11 @@
       // 7) When user drags latency slider:
       latencySlider.addEventListener("input", () => {
         updateTooltip(latencySlider, latencyTooltip, latencyText, latencyOptions);
+      });
+
+      // 7a) Toggle explanation box when the ? button is clicked:
+      infoBtn.addEventListener("click", () => {
+        infoBox.classList.toggle("hidden");
       });
 
       // 8) When user clicks "Calculate Wake Time":
