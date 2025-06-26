@@ -226,10 +226,86 @@
       </div>
     </div>
   </div>
-  <div id="calc-info-btn" class="fixed bottom-4 right-4 w-8 h-8 rounded-full bg-gray-700 bg-opacity-60 flex items-center justify-center text-white cursor-pointer">?
-  </div>
-  <div id="calc-info-box" class="hidden fixed bottom-16 right-4 bg-gray-700 bg-opacity-90 text-white text-sm p-4 rounded-md max-w-xs">
-    We pick a random fall-asleep time within your chosen range and add 90‑minute cycles (or 20&nbsp;min for a quick nap) to estimate your wake-up time.
+  <button id="calc-info-btn" class="fixed bottom-4 right-4 flex items-center space-x-1 bg-gray-700 bg-opacity-60 text-white text-sm py-1 px-2 rounded-full cursor-pointer">
+    <span class="font-bold">?</span>
+    <span class="hidden sm:inline">How it works</span>
+  </button>
+
+  <div id="calc-info-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+    <div class="relative bg-white text-gray-900 p-4 rounded-lg max-w-2xl max-h-screen overflow-y-auto">
+      <button id="calc-info-close" class="absolute top-2 right-2 text-black">✕</button>
+      <pre class="whitespace-pre-wrap text-xs">
+Below you’ll find (1) a compact “scientific” model, (2) the closed‑form formula it produces, and (3) a drop‑in JavaScript function that reads the user’s computer clock, plugs the parameters, and prints the next few “good‑wake‑up” alarm times.
+
+---
+
+## 1 Modelling the problem
+
+### 1.1 Notation
+
+| symbol | meaning                                              | typical value    |
+| ------ | ---------------------------------------------------- | ---------------- |
+| 𝐵     | clock‑time you lie down (bedtime)                    | **now**          |
+| 𝐿     | average sleep‑latency (min needed to fall asleep)    | 10 – 20 min      |
+| 𝐶     | average duration of one full sleep cycle             | 90 min (±15 min) |
+| φ     | offset in a cycle where the **lightest** stage peaks | 75 – 85 min      |
+| σ     | spread (SD) of the “light‑sleep peak”                | ≈ 10 min         |
+| 𝑆ₘᵢₙ | minimum total sleep you accept (safety net)          | e.g. 6 h         |
+| 𝑘    | integer cycle index (0, 1, 2 …)                      | –                |
+
+### 1.2 Probability of light sleep
+
+Empirically, light/N1 or REM sleep (easy‑wake phases) cluster at roughly the same point of every cycle.  A convenient, smooth approximation is a Gaussian “bump” repeating every cycle:
+
+$$
+p(t)=\sum_{k=0}^{\infty}
+\exp\!\Bigl(-\frac{(t-kC-\varphi)^2}{2\sigma^{2}}\Bigr)
+$$
+
+where $t$ is time since **sleep onset** (bedtime + latency).  Waking exactly when $p(t)$ is maximal gives the gentlest awakening.
+
+### 1.3 Picking the best cycle
+
+Let
+
+$$
+t^\star = \text{arg max}_{t\ge S_\text{min}}\; p(t)
+$$
+
+Because $p(t)$ is periodic with period $C$, the maximiser is the first peak after the minimum‑sleep threshold:
+
+$$
+k^\star \;=\; \Bigl\lceil\frac{S_\text{min}-\varphi}{C}\Bigr\rceil
+\qquad\Longrightarrow\qquad
+ t^\star \;=\; k^\star C + \varphi
+$$
+
+### 1.4 Closed‑form alarm‑time formula
+
+$$
+\boxed{\;A \;=\; B + L + \bigl\lceil\tfrac{S_\text{min}-\varphi}{C}\bigr\rceil\,C + \varphi\;}
+$$
+
+or, if you simply want “the next N suitable alarms”, enumerate
+
+$$
+A_n \;=\; B + L + (k^\star+n)\,C + \varphi,
+\qquad n=0,1,\dots,N-1
+$$
+
+---
+
+## 2 Choosing sensible parameter defaults
+
+| parameter | default you might start with | why                          |
+| --------- | ---------------------------- | ---------------------------- |
+| 𝐿        | 15 min                       | population mean              |
+| 𝐶        | 90 min                       | canonical cycle length       |
+| φ         | 80 min                       | REM/light cluster            |
+| σ         | 10 min                       | gives ±10 min “sweet zone”   |
+| 𝑆ₘᵢₙ     | 6 h (360 min)                | preserves cognitive function |
+      </pre>
+    </div>
   </div>
 
   <!-- ------------------------------------ -->
@@ -250,7 +326,8 @@
       const resultContainer = document.getElementById("result");
       const wakeTimeSpan    = document.getElementById("wake-time");
       const infoBtn         = document.getElementById("calc-info-btn");
-      const infoBox         = document.getElementById("calc-info-box");
+      const infoOverlay     = document.getElementById("calc-info-overlay");
+      const infoClose       = document.getElementById("calc-info-close");
 
       // 3) Mappings for the sliders:
       //    slider value 1→4 → descriptive text
@@ -299,7 +376,10 @@
 
       // 7a) Toggle explanation box when the ? button is clicked:
       infoBtn.addEventListener("click", () => {
-        infoBox.classList.toggle("hidden");
+        infoOverlay.classList.toggle("hidden");
+      });
+      infoClose.addEventListener("click", () => {
+        infoOverlay.classList.add("hidden");
       });
 
       // 8) When user clicks "Calculate Wake Time":
