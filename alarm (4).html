@@ -140,13 +140,8 @@
       max-height: 70vh;
       opacity: 1;
       pointer-events: auto;
-
-      overflow: hidden;
+      overflow-y: auto;
       transition: max-height 0.5s ease;
-    }
-    #calc-info-panel.open {
-      max-height: 70vh;
-
     }
   </style>
 </head>
@@ -258,9 +253,6 @@
       <div id="calc-info-content" class="prose prose-invert text-xs"></div>
     </div>
 
-
-    </div>
-
   <!-- ------------------------------------ -->
   <!--  JavaScript Calculation Logic        -->
   <!-- ------------------------------------ -->
@@ -338,13 +330,13 @@
 <p>Empirically, light/N1 or REM sleep (easy‑wake phases) cluster at roughly the same point of every cycle.  A convenient, smooth approximation is a Gaussian “bump” repeating every cycle:</p>
 <p>$$
 p(t)=\sum_{k=0}^{\infty}
-\exp!\Bigl(-\frac{(t-kC-\varphi)^2}{2\sigma^{2}}\Bigr)
+\exp\Bigl(-\frac{(t-kC-\varphi)^2}{2\sigma^{2}}\Bigr)
 $$</p>
 <p>where $t$ is time since <strong>sleep onset</strong> (bedtime + latency).  Waking exactly when $p(t)$ is maximal gives the gentlest awakening.</p>
 <h3>1.3 Picking the best cycle</h3>
 <p>Let</p>
 <p>$$
-t^\star = \text{arg max}<em>{t\ge S</em>\text{min}}\; p(t)
+t^\star = \text{arg\,max}_{t\ge S_{\text{min}}}\, p(t)
 $$</p>
 <p>Because $p(t)$ is periodic with period $C$, the maximiser is the first peak after the minimum‑sleep threshold:</p>
 <p>$$
@@ -402,8 +394,7 @@ $$</p>
         infoContent.innerHTML = infoHTML;
         if (window.MathJax) MathJax.typesetPromise();
       
-      const infoPanel     = document.getElementById("calc-info-panel");
-      const infoClose       = document.getElementById("calc-info-close");
+
 
       // 3) Mappings for the sliders:
       //    slider value 1→4 → descriptive text
