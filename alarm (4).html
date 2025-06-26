@@ -130,6 +130,7 @@
     }
     #calc-info-panel {
       max-height: 0;
+
       opacity: 0;
       overflow: hidden;
       pointer-events: none;
@@ -139,6 +140,13 @@
       max-height: 70vh;
       opacity: 1;
       pointer-events: auto;
+
+      overflow: hidden;
+      transition: max-height 0.5s ease;
+    }
+    #calc-info-panel.open {
+      max-height: 70vh;
+
     }
   </style>
 </head>
@@ -249,6 +257,7 @@
       <button id="calc-info-close" class="absolute top-2 right-2 text-white">✕</button>
       <div id="calc-info-content" class="prose prose-invert text-xs"></div>
     </div>
+
 
     </div>
 
@@ -392,6 +401,10 @@ $$</p>
 </table>`;
         infoContent.innerHTML = infoHTML;
         if (window.MathJax) MathJax.typesetPromise();
+      
+      const infoPanel     = document.getElementById("calc-info-panel");
+      const infoClose       = document.getElementById("calc-info-close");
+
       // 3) Mappings for the sliders:
       //    slider value 1→4 → descriptive text
       const durationOptions = {
