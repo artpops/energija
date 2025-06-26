@@ -7,6 +7,8 @@
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap" rel="stylesheet">
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <style>
     body {
       font-family: 'Noto Sans', sans-serif;
@@ -231,9 +233,15 @@
     <span class="hidden sm:inline">How it works</span>
   </button>
 
+<<<<<<< znip64-codex/add-question-mark-popup-on-alarm-page
+  <div id="calc-info-overlay" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 pointer-events-none transition-opacity duration-300 z-50">
+    <div id="calc-info-box" class="relative bg-gray-800 text-gray-100 p-4 rounded-lg max-w-2xl w-11/12 max-h-screen overflow-y-auto transform scale-95 transition-transform duration-300">
+      <button id="calc-info-close" class="absolute top-2 right-2 text-gray-300 hover:text-white">✕</button>
+=======
   <div id="calc-info-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
     <div class="relative bg-white text-gray-900 p-4 rounded-lg max-w-2xl max-h-screen overflow-y-auto">
       <button id="calc-info-close" class="absolute top-2 right-2 text-black">✕</button>
+>>>>>>> main
       <pre class="whitespace-pre-wrap text-xs">
 Below you’ll find (1) a compact “scientific” model, (2) the closed‑form formula it produces, and (3) a drop‑in JavaScript function that reads the user’s computer clock, plugs the parameters, and prints the next few “good‑wake‑up” alarm times.
 
@@ -327,6 +335,10 @@ $$
       const wakeTimeSpan    = document.getElementById("wake-time");
       const infoBtn         = document.getElementById("calc-info-btn");
       const infoOverlay     = document.getElementById("calc-info-overlay");
+<<<<<<< znip64-codex/add-question-mark-popup-on-alarm-page
+      const infoBox         = document.getElementById("calc-info-box");
+=======
+>>>>>>> main
       const infoClose       = document.getElementById("calc-info-close");
 
       // 3) Mappings for the sliders:
@@ -375,11 +387,32 @@ $$
       });
 
       // 7a) Toggle explanation box when the ? button is clicked:
+<<<<<<< znip64-codex/add-question-mark-popup-on-alarm-page
+      function openInfo() {
+        infoOverlay.classList.remove("pointer-events-none", "opacity-0");
+        infoOverlay.classList.add("opacity-100");
+        infoBox.classList.remove("scale-95");
+        infoBox.classList.add("scale-100");
+      }
+
+      function closeInfo() {
+        infoBox.classList.add("scale-95");
+        infoBox.classList.remove("scale-100");
+        infoOverlay.classList.add("opacity-0", "pointer-events-none");
+        infoOverlay.classList.remove("opacity-100");
+      }
+
+      infoBtn.addEventListener("click", openInfo);
+      infoClose.addEventListener("click", closeInfo);
+      infoOverlay.addEventListener("click", (e) => {
+        if (e.target === infoOverlay) closeInfo();
+=======
       infoBtn.addEventListener("click", () => {
         infoOverlay.classList.toggle("hidden");
       });
       infoClose.addEventListener("click", () => {
         infoOverlay.classList.add("hidden");
+>>>>>>> main
       });
 
       // 8) When user clicks "Calculate Wake Time":
