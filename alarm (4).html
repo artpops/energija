@@ -7,6 +7,8 @@
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap" rel="stylesheet">
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <style>
     body {
       font-family: 'Noto Sans', sans-serif;
@@ -124,6 +126,15 @@
         transform: translate(-50%, -40px) scale(1.5);
         opacity: 0;
       }
+    
+    }
+    #calc-info-panel {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease;
+    }
+    #calc-info-panel.open {
+      max-height: 70vh;
     }
   </style>
 </head>
@@ -231,8 +242,7 @@
     <span class="hidden sm:inline">How it works</span>
   </button>
 
-  <div id="calc-info-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
-    <div class="relative bg-white text-gray-900 p-4 rounded-lg max-w-2xl max-h-screen overflow-y-auto">
+  <div id="calc-info-panel" class="fixed bottom-20 right-4 bg-white text-gray-900 p-4 rounded-lg shadow-lg w-11/12 sm:w-96 max-w-2xl overflow-y-auto">
       <button id="calc-info-close" class="absolute top-2 right-2 text-black">✕</button>
       <pre class="whitespace-pre-wrap text-xs">
 Below you’ll find (1) a compact “scientific” model, (2) the closed‑form formula it produces, and (3) a drop‑in JavaScript function that reads the user’s computer clock, plugs the parameters, and prints the next few “good‑wake‑up” alarm times.
@@ -306,7 +316,6 @@ $$
 | 𝑆ₘᵢₙ     | 6 h (360 min)                | preserves cognitive function |
       </pre>
     </div>
-  </div>
 
   <!-- ------------------------------------ -->
   <!--  JavaScript Calculation Logic        -->
@@ -326,7 +335,7 @@ $$
       const resultContainer = document.getElementById("result");
       const wakeTimeSpan    = document.getElementById("wake-time");
       const infoBtn         = document.getElementById("calc-info-btn");
-      const infoOverlay     = document.getElementById("calc-info-overlay");
+      const infoPanel     = document.getElementById("calc-info-panel");
       const infoClose       = document.getElementById("calc-info-close");
 
       // 3) Mappings for the sliders:
@@ -376,10 +385,10 @@ $$
 
       // 7a) Toggle explanation box when the ? button is clicked:
       infoBtn.addEventListener("click", () => {
-        infoOverlay.classList.toggle("hidden");
+        infoPanel.classList.toggle("open");
       });
       infoClose.addEventListener("click", () => {
-        infoOverlay.classList.add("hidden");
+        infoPanel.classList.remove("open");
       });
 
       // 8) When user clicks "Calculate Wake Time":
